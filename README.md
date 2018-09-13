@@ -8,15 +8,15 @@ This is the schema of this simple deployer:
 
 ![k8s on GKE](schema.png)
 
-##Requirements
+## Requirements
 
 - Make (gcc)
 - Docker (17+)
 - GCP project and the json file with credentials and GKE service enabled for your account.
 
-##HOW TO
+## HOWTO
 
-###Setup 
+### Setup 
 
 You have to provide some variables to connect with GKE service correctly.
 
@@ -34,7 +34,7 @@ GKE_NODES_MAX=5
 GKE_IMAGE_TYPE=n1-standard-8
 ```
 
-###Create a cluster
+### Create a cluster
 
 Just type:
 
@@ -57,14 +57,14 @@ docker exec -it gke-bastion bash -c 'gcloud compute accelerator-types list'
 docker exec -it gke-bastion bash -c 'kubectl cluster-info'
 ```
 
-###Add node pool
+### Add node pool
 
 ```bash
 GKE_NODE=3 GKE_NODE_MAX=10 GKE_IMAGE_TYPE=n1-standard-4 GKE_POOL_NAME=poor make gke-create-pool 
 ```
 
 
-###Add gpu node pool
+### Add gpu node pool
 
 ```bash
 GKE_GPU_AMOUNT=2 GKE_GPU_TYPE=nvidia-tesla-v100 make gke-create-gpu-pool 
@@ -76,7 +76,7 @@ After pool of gpus is available you'll need to add drivers to nodes:
 make gke-create-gpu-nvidia-driver
 ```
 
-###Clean all
+### Clean all
 
 ```bash
 make clean-all
