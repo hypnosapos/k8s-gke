@@ -122,7 +122,7 @@ gke-destroy-pool: ## Destroy a node pool.
 .PHONY: gke-destroy-cluster
 gke-destroy-cluster: ## Destroy the cluster.
 	@docker exec gke-bastion \
-	   sh -c "gcloud config set project $(GCP_PROJECT_ID) && gcloud config set project $(GCP_PROJECT_ID) \
+	   sh -c "gcloud config set project $(GCP_PROJECT_ID) \
 	          && gcloud container --project $(GCP_PROJECT_ID) clusters delete $(GKE_CLUSTER_NAME) \
 	          --zone $(GCP_ZONE) --quiet"
 
