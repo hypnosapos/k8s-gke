@@ -20,19 +20,7 @@ This is the schema of this simple deployer:
 
 You have to provide some variables to connect with GKE service correctly.
 
-You may use env variables, modify variables directly on Makefile or load variables from other source, for instance from a sh file:
-
-```bash
-GCP_CREDENTIALS=/path/project-*******.json
-GCP_ZONE=europe-west4-a
-GCP_PROJECT_ID=my_project
-GKE_CLUSTER_NAME=my_cluster
-GITHUB_TOKEN=**********
-GKE_CLUSTER_VERSION=1.10.7-gke.1
-GKE_NODES=2
-GKE_NODES_MAX=5
-GKE_IMAGE_TYPE=n1-standard-8
-```
+You may use env variables, provide them via shell, modify variables directly on Makefile or load variables from other source, for instance we'll use a sh file `k8s-gke`.
 
 ### Create a cluster
 
@@ -55,6 +43,7 @@ Now you can use the container gke-bastion as proxy for any gcloud or kubectl com
 ```bash
 docker exec -it gke-bastion bash -c 'gcloud compute accelerator-types list'
 docker exec -it gke-bastion bash -c 'kubectl cluster-info'
+docker exec -it gke-bastion bash -c 'helm install --name nginx-proba stable/nginx-ingress'
 ```
 
 ### Add node pool
@@ -70,12 +59,16 @@ GKE_NODE=3 GKE_NODE_MAX=10 GKE_IMAGE_TYPE=n1-standard-4 GKE_POOL_NAME=poor make 
 GKE_GPU_AMOUNT=2 GKE_GPU_TYPE=nvidia-tesla-v100 make gke-create-gpu-pool 
 ```
 
-After pool of gpus is available you'll need to add drivers to nodes: 
+After pool of gpu is available you'll need to add drivers to nodes in order to kubernetes scheduler will be capable to allocate those resources: 
 
 ```bash
 make gke-create-gpu-nvidia-driver
 ```
+### Destroy a node pool
 
+```bash
+GKE_POOL_NAME=poor make gke-destroy-pool
+```
 ### Clean all
 
 ```bash

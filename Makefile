@@ -82,7 +82,7 @@ gke-proxy: ## Run kubectl proxy on gke container.
 	   sh -c "kubectl proxy --address='0.0.0.0'"
 
 .PHONY: gke-tiller-helm
-gke-tiller-helm: ## Install Helm on GKE cluster.
+gke-tiller-helm: ## Install tiller and helm.
 	@docker exec gke-bastion \
 	  sh -c "apk --update add openssl \
 	         && curl  -H 'Cache-Control: no-cache' -H 'Authorization: token $(GITHUB_TOKEN)' https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash \
@@ -97,7 +97,7 @@ gke-create-gpu-nvidia-driver:
 	    https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/stable/nvidia-driver-installer/cos/daemonset-preloaded.yaml"
 
 .PHONY: gke-create-pool
-gke-create-pool: ## Create a node pool for kubernetes cluster on GKE.
+gke-create-pool: ## Create a node pool.
 	@docker exec gke-bastion \
 	  sh -c "gcloud config set project $(GCP_PROJECT_ID) && gcloud container node-pools create $(GKE_POOL_NAME) \
 	         --zone $(GCP_ZONE) \
@@ -105,17 +105,24 @@ gke-create-pool: ## Create a node pool for kubernetes cluster on GKE.
 	         --max-nodes $(GKE_NODES_MAX) --machine-type "$(GKE_IMAGE_TYPE)" --enable-autoscaling --preemptible"
 
 .PHONY: gke-create-gpu-pool
-gke-create-gpu-pool: ## Create a GPU node pool for kubernetes cluster on GKE.
+gke-create-gpu-pool: ## Create a GPU node pool.
 	@docker exec gke-bastion \
 	  sh -c "gcloud config set project $(GCP_PROJECT_ID) && gcloud container node-pools create $(GKE_POOL_NAME)-gpu \
 	         --accelerator type=$(GKE_GPU_TYPE),count=$(GKE_GPU_AMOUNT) --zone $(GCP_ZONE) \
 	         --cluster $(GKE_CLUSTER_NAME) --num-nodes $(GKE_NODES) --min-nodes $(GKE_NODES_MIN) \
 	         --max-nodes $(GKE_NODES_MAX) --machine-type "$(GKE_IMAGE_TYPE)" --enable-autoscaling --preemptible"
 
+.PHONY: gke-destroy-pool
+gke-destroy-pool: ## Destroy a node pool.
+	@docker exec gke-bastion \
+	  sh -c "gcloud config set project $(GCP_PROJECT_ID) && gcloud container node-pools delete $(GKE_POOL_NAME) \
+	         --zone $(GCP_ZONE) --cluster $(GKE_CLUSTER_NAME)"
+
+
 .PHONY: gke-destroy-cluster
 gke-destroy-cluster: ## Destroy the cluster.
 	@docker exec gke-bastion \
-	   sh -c "gcloud config set project $(GCP_PROJECT_ID) \
+	   sh -c "gcloud config set project $(GCP_PROJECT_ID) && gcloud config set project $(GCP_PROJECT_ID) \
 	          && gcloud container --project $(GCP_PROJECT_ID) clusters delete $(GKE_CLUSTER_NAME) \
 	          --zone $(GCP_ZONE) --quiet"
 
