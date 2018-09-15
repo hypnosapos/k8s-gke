@@ -2,7 +2,6 @@
 
 # Shell to use with Make
 SHELL ?= /bin/bash
-ROOT_PATH := $(PWD)/$({0%/*})
 
 GCLOUD_IMAGE_TAG    ?= alpine
 GCP_CREDENTIALS     ?= $$HOME/gcp.json
@@ -48,7 +47,6 @@ gke-bastion: ## Run a gke-bastion container with port 8001 for proxy.
 	@docker run -it -d --name gke-bastion \
 	   -p 8001:8001 \
 	   -v $(GCP_CREDENTIALS):/tmp/gcp.json \
-	   -v $(ROOT_PATH):/cartpole-rl-remote \
 	   google/cloud-sdk:$(GCLOUD_IMAGE_TAG) \
 	   sh
 	@docker exec gke-bastion \
@@ -72,7 +70,7 @@ gke-create-cluster: ## Create a kubernetes cluster on GKE.
 
 .PHONY: gke-ui-login-skip
 gke-ui-login-skip: ## TRICK: Grant complete access to dashboard. Be careful, anyone could enter into your dashboard and execute unexpected ops.
-	@docker cp $(ROOT_PATH)skip_login.yml gke-bastion:/tmp/skip_login.yml
+	@docker cp skip_login.yml gke-bastion:/tmp/skip_login.yml
 	@docker exec gke-bastion \
 	  sh -c "kubectl create -f /tmp/skip_login.yml"
 
