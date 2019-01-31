@@ -14,6 +14,7 @@ GKE_NODES_MIN       ?= 1
 GKE_NODES           ?= 2
 GKE_NODES_MAX       ?= 3
 GKE_IMAGE_TYPE      ?= n1-standard-8
+GKE_SCOPES          ?= "compute-rw","storage-rw","logging-write","monitoring","service-control","service-management","trace"
 
 GKE_GPU_AMOUNT      ?= 1
 GKE_GPU_TYPE        ?= nvidia-tesla-v100
@@ -61,7 +62,7 @@ gke-create-cluster: ## Create a kubernetes cluster on GKE.
 	          --zone "$(GCP_ZONE)" --project $(GCP_PROJECT_ID) \
 	          --username "admin" --cluster-version "$(GKE_CLUSTER_VERSION)" --machine-type "$(GKE_IMAGE_TYPE)" \
 	          --image-type "COS" --disk-type "pd-standard" --disk-size "100" \
-	          --scopes "compute-rw","storage-rw","logging-write","monitoring","service-control","service-management","trace" \
+	          --scopes $(GKE_SCOPES) \
 	          --num-nodes "$(GKE_NODES)" --min-nodes $(GKE_NODES_MIN) --max-nodes $(GKE_NODES_MAX) \
 	          --enable-cloud-logging --enable-cloud-monitoring --network "default" \
 	          --subnetwork "default" --addons HorizontalPodAutoscaling,HttpLoadBalancing,KubernetesDashboard"
@@ -129,3 +130,4 @@ gke-destroy-cluster: ## Destroy the cluster.
 .PHONY: gke-ui
 gke-ui: ## Launch kubernetes dashboard through the proxy.
 	$(OPEN) http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+
