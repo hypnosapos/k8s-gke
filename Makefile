@@ -66,10 +66,9 @@ gke-create-cluster: ## Create a kubernetes cluster on GKE.
 	          --enable-cloud-logging --enable-cloud-monitoring --network "default" \
 	          --subnetwork "default" --addons HorizontalPodAutoscaling,HttpLoadBalancing,KubernetesDashboard"
 	@docker exec gke-bastion \
-	   sh -c "gcloud container clusters get-credentials $(GKE_CLUSTER_NAME) \
-	            --zone "$(GCP_ZONE)" --project $(GCP_PROJECT_ID) \
+	   sh -c "gcloud container clusters get-credentials $(GKE_CLUSTER_NAME) --zone "$(GCP_ZONE)" \
 	          && kubectl config set-credentials gke_$(GCP_PROJECT_ID)_$(GCP_ZONE)_$(GKE_CLUSTER_NAME) --username=admin \
-	            --password=$$(gcloud container clusters describe --zone "$(GCP_ZONE)" $(GKE_CLUSTER_NAME) | grep password | awk '{print $$2}')"
+	            --password=$$(gcloud container clusters describe --project $(GCP_PROJECT_ID) --zone "$(GCP_ZONE)" $(GKE_CLUSTER_NAME) | grep password | awk '{print $$2}')"
 
 .PHONY: gke-ui-login-skip
 gke-ui-login-skip: ## TRICK: Grant complete access to dashboard. Be careful, anyone could enter into your dashboard and execute unexpected ops.
